@@ -303,17 +303,13 @@ let adList = [
  ]
  let getAds = (function(skip = 0, top = 10, filterConfig = {}){
     let adsToShow = [];
-    let key = Object.keys(filterConfig);
+    let keys = Object.keys(filterConfig);
 
-    if(key.length == 0){ 
-        for(let i=skip;i<top+skip;++i){
-            if(i > adList.length){
-                break;
-            }
-            adsToShow.push(adList[i]);
-        }
-    } else if(key[0] == 'vendors'){
-        let vendors = filterConfig[[key[0]]];
+     if(keys.length == 0){ 
+        adsToShow = adList.slice(skip,top);
+
+    } else if(keys[0] == 'vendors'){
+        let vendors = filterConfig[[keys[0]]];
         let skipped_ads = 0;
         let i = 0;
         while(skipped_ads < skip && i < adList.length){
@@ -328,8 +324,8 @@ let adList = [
             }
             i++;
         }
-    }else if(key[0] == 'hashTags'){
-        let hashTags = filterConfig[[key[0]]];
+    }else if(keys[0] == 'hashTags'){
+        let hashTags = filterConfig[[keys[0]]];
         let skipped_ads = 0;
         let i = 0;
         while(skipped_ads<skip && i < adList.length){
@@ -386,9 +382,9 @@ let addAd = (function(ad){
     if(validateAd(ad)){
         adList.push(ad);
         return true;
-    }else{
-        return false;
     }
+        return false;
+    
 });
 let editAd = (function(id,changes){
     let keys = Object.keys(changes);
@@ -396,16 +392,11 @@ let editAd = (function(id,changes){
         return false;
     }
 
-    let ind;
-    for(let i=0;i<=adList.length;++i){
-        if(i == adList.length){
-            return false;
-        }else if(adList[i].id === id){
-            ind = i;
-            break;
-        }
+    let ind = adList.findIndex(currentValue => currentValue.id == id);
+    if (ind === -1) {
+        return false;
     }
-    new_ad = adList[ind];
+    new_ad = Object.assign(adList[ind]);
     for(let i=0;i<=adList.length;++i){
         new_ad[keys[i]] = changes[keys[i]];
     }
@@ -418,13 +409,12 @@ let editAd = (function(id,changes){
 
 });
 let removeAd = (function(id){
-    for (let i = 0;i<adList.length;++i){
-        if(adList[i].id === id){
-            adList.splice(i,1);
-            return true;
-        }
+     let index = adList.findIndex((item)=> item["id"] === id);
+    if (index === -1) {
+        return false;
     }
-    return false;
+    adList.splice(index,1);
+    return true;
 });
 
 
